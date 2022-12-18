@@ -13,22 +13,21 @@
 
 <body>
     <div id="app" v-cloak>
-        <ul>
-            <li v-for="message in messages">
-                {{ message.text }} - {{ message.createdAt }}
-                <button @click="deleteMessage(message)">X</button>
-            </li>
-        </ul>
-        <form v-on:submit.prevent="addMessage">
+        <message-list :items="messages" @delete="deleteMessage">/</message-list>
+        <form @submit.prevent="addMessage">
             <textarea v-model="newMessage" placeholder="Leave a message"></textarea>
             <div><button :disabled="addDisabled" type="submit">Add</button></div>
         </form>
 
     </div>
     <script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
-    <script>
+    <script type="module">
+        import MessageList from './components/MessageList.js'
         let vm = new Vue({
             el:'#app',
+            components: {
+                MessageList
+            },
             data: {
                 messages: [],
                 newMessage: ''
@@ -37,7 +36,13 @@
                 addMessage(event){
                     console.log('addMessage');
                     if(!this.newMessage){return;}
-                    this.messages.push({text: this.newMessage, createdAt: new Date()});
+
+                    let now = new Date();
+                    this.messages.push({
+                        id: now.getTime(),
+                        text: this.newMessage,
+                        createdAt: now
+                    });
                     this.newMessage = '';
                 },
                 deleteMessage(message){
